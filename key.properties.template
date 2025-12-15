@@ -1,0 +1,5 @@
+# Copy this template to `key.properties`, fill with the values from your release keystore, and keep it out of version control.
+storePassword=your-keystore-password
+keyPassword=your-key-password
+keyAlias=your-key-alias
+storeFile=android/app/toonga-release.keystore
