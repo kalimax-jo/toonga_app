@@ -61,4 +61,4 @@ ios/.symlinks/
 # IDE
 .vscode/
 .idea/
-
+!ios/Runner/Assets.xcassets/AppIcon.appiconset/Contents.json
