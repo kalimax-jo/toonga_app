@@ -10,23 +10,23 @@ workflows:
       flutter: stable
       xcode: latest
 
-    triggering:
-      events:
-        - push
-      branch_patterns:
-        - pattern: main
-          include: true
-          source: true
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.toongapp
 
     scripts:
-      - name: Flutter setup
+      - name: Flutter clean
         script: |
-          flutter --version
-          flutter config --no-analytics
           flutter clean
           flutter pub get
 
-      - name: Build iOS IPA
+      - name: Install pods
+        script: |
+          cd ios
+          pod install --repo-update
+          cd ..
+
+      - name: Build IPA
         script: |
           flutter build ipa --release
 
@@ -34,10 +34,6 @@ workflows:
       - build/ios/ipa/*.ipa
 
     publishing:
-      email:
-        recipients:
-          - your-email@example.com
-
       app_store_connect:
         api_key: $APP_STORE_CONNECT_API_KEY
         key_id: $APP_STORE_CONNECT_KEY_ID
