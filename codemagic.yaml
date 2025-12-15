@@ -1,8 +1,8 @@
 workflows:
   ios-release:
     name: iOS Release
-    max_build_duration: 120
     instance_type: mac_mini_m2
+    max_build_duration: 120
 
     environment:
       flutter: stable
@@ -25,5 +25,3 @@ workflows:
       app_store_connect:
         api_key: Codemagic Toonga
         submit_to_testflight: true
-        beta_groups:
-          - Internal Testers
