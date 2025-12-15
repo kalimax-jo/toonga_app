@@ -1,0 +1,38 @@
+workflows:
+  ios-release:
+    name: iOS Release (Automatic Signing)
+    max_build_duration: 120
+    environment:
+      flutter: stable
+      xcode: latest
+      cocoapods: default
+
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.toongapp
+
+    scripts:
+      - name: Flutter clean
+        script: |
+          flutter clean
+          flutter pub get
+
+      - name: Set iOS minimum version
+        script: |
+          sed -i '' 's/IPHONEOS_DEPLOYMENT_TARGET = [0-9.]*/IPHONEOS_DEPLOYMENT_TARGET = 15.0/g' ios/Runner.xcodeproj/project.pbxproj || true
+
+      - name: Build IPA with automatic signing
+        script: |
+          flutter build ipa \
+            --release \
+            --no-codesign=false
+
+    artifacts:
+      - build/ios/ipa/*.ipa
+      - build/ios/archive/*.xcarchive
+
+    publishing:
+      app_store_connect:
+        auth: integration
+        submit_to_testflight: true
+        submit_to_app_store: false
