@@ -6,7 +6,7 @@ workflows:
 
     environment:
       groups:
-        - app_store_credentials  # Make sure this group exists in Codemagic UI
+        - app_store_credentials
       flutter: stable
       xcode: latest
 
@@ -14,24 +14,20 @@ workflows:
       events:
         - push
       branch_patterns:
-        - pattern: 'main'
+        - pattern: main
           include: true
           source: true
 
     scripts:
-      - name: Setup and dependencies
+      - name: Flutter setup
         script: |
           flutter --version
           flutter config --no-analytics
           flutter clean
-          rm -rf ios/Pods ios/.symlinks
           flutter pub get
-          
-      - name: Build iOS app
+
+      - name: Build iOS IPA
         script: |
-          cd ios
-          pod install --repo-update
-          cd ..
           flutter build ipa --release
 
     artifacts:
@@ -41,12 +37,9 @@ workflows:
       email:
         recipients:
           - your-email@example.com
-      
+
       app_store_connect:
-        api_key: $APP_STORE_CONNECT_PRIVATE_KEY
+        api_key: $APP_STORE_CONNECT_API_KEY
         key_id: $APP_STORE_CONNECT_KEY_ID
         issuer_id: $APP_STORE_CONNECT_ISSUER_ID
         submit_to_testflight: true
-        # Optional: Add beta groups if needed
-        # beta_groups:
-        #   - "Testers"
