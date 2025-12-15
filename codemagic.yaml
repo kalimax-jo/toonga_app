@@ -5,27 +5,77 @@ workflows:
     max_build_duration: 120
 
     environment:
+      groups:
+        - app_store_credentials  # Store your credentials in environment groups
+      vars:
+        APP_STORE_APPLE_ID: $APP_STORE_APPLE_ID  # Your Apple ID
+        APP_IDENTIFIER: com.example.yourapp  # Your app bundle identifier
+        APP_STORE_APP_ID: 1234567890  # Your App Store Connect App ID
       flutter: stable
       xcode: latest
 
+    triggering:
+      events:
+        - push
+      branch_patterns:
+        - pattern: 'main'
+          include: true
+          source: true
+
     scripts:
-      - name: Flutter clean
+      - name: Setup
         script: |
-          flutter clean
+          # Set up code signing
+          mkdir -p ~/private_keys
+          echo $APP_STORE_CONNECT_PRIVATE_KEY | base64 --decode > ~/private_keys/AuthKey_$APP_STORE_CONNECT_KEY_ID.p8
+          
+          # Set up Flutter
+          flutter --version
+          flutter config --no-analytics
           flutter pub get
 
-      - name: Build IPA
+      - name: Clean and get packages
         script: |
-          flutter build ipa --release
+          flutter clean
+          rm -rf ios/Pods ios/.symlinks
+          flutter pub get
+
+      - name: Build iOS app
+        script: |
+          cd ios
+          pod install
+          cd ..
+          flutter build ipa --release --no-codesign
+
+      - name: Code signing and prepare for upload
+        script: |
+          cd ios
+          xcodebuild -workspace Runner.xcworkspace \
+            -scheme Runner \
+            -configuration Release \
+            -archivePath build/Runner.xcarchive \
+            archive
+          
+          xcodebuild -exportArchive \
+            -archivePath build/Runner.xcarchive \
+            -exportOptionsPlist ../export_options.plist \
+            -exportPath ../build/ios/ipa
 
     artifacts:
       - build/ios/ipa/*.ipa
+      - build/ios/archive/*.xcarchive
+      - flutter_drive.log
 
     publishing:
-      - name: Publish to TestFlight
-        app_store_connect:
-          api_key:
-            key_id: $APP_STORE_CONNECT_KEY_ID
-            issuer_id: $APP_STORE_CONNECT_ISSUER_ID
-            private_key: $APP_STORE_CONNECT_PRIVATE_KEY
-          submit_to_testflight: true
+      email:
+        recipients:
+          - your-email@example.com
+      
+      app_store_connect:
+        api_key:
+          key_id: $APP_STORE_CONNECT_KEY_ID
+          issuer_id: $APP_STORE_CONNECT_ISSUER_ID
+          private_key: $APP_STORE_CONNECT_PRIVATE_KEY
+        submit_to_testflight: true
+        beta_groups: # Optional: Specify beta groups
+          - "Testers Group"
