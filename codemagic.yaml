@@ -30,42 +30,42 @@ workflows:
   # iOS RELEASE → TESTFLIGHT
   # ==============================
   ios-release:
-  name: iOS Release (TestFlight)
-  instance_type: mac_mini_m2
-  max_build_duration: 120
+    name: iOS Release (TestFlight)
+    instance_type: mac_mini_m2
+    max_build_duration: 120
 
-  environment:
-    groups:
-      - app_store_credentials
-    flutter: stable
-    xcode: latest
+    environment:
+      groups:
+        - app_store_credentials
+      flutter: stable
+      xcode: latest
 
-    ios_signing:
-      distribution_type: app_store
-      bundle_identifier: com.toongapp
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.toongapp
 
-  scripts:
-    - name: Flutter clean & get packages
-      script: |
-        flutter clean
-        flutter pub get
+    scripts:
+      - name: Flutter clean & get packages
+        script: |
+          flutter clean
+          flutter pub get
 
-    - name: Install CocoaPods
-      script: |
-        cd ios
-        pod install --repo-update
-        cd ..
+      - name: Install CocoaPods
+        script: |
+          cd ios
+          pod install --repo-update
+          cd ..
 
-    - name: Build IPA
-      script: |
-        flutter build ipa --release --build-number=$BUILD_NUMBER
+      - name: Build IPA
+        script: |
+          flutter build ipa --release --build-number=$BUILD_NUMBER
 
-  artifacts:
-    - build/ios/ipa/*.ipa
+    artifacts:
+      - build/ios/ipa/*.ipa
 
-  publishing:
-    app_store_connect:
-      api_key: $APP_STORE_CONNECT_API_KEY
-      key_id: $APP_STORE_CONNECT_KEY_ID
-      issuer_id: $APP_STORE_CONNECT_ISSUER_ID
-      submit_to_testflight: true
+    publishing:
+      app_store_connect:
+        api_key: $APP_STORE_CONNECT_API_KEY
+        key_id: $APP_STORE_CONNECT_KEY_ID
+        issuer_id: $APP_STORE_CONNECT_ISSUER_ID
+        submit_to_testflight: true
