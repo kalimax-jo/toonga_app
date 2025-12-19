@@ -37,8 +37,14 @@
 	<string>Toonga uses your camera for avatar updates and scanning barcodes.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Photolibrary access lets you pick saved pictures for avatars or proof-of-purchase.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Allow Toonga to save images that help you capture receipts or product information.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Location access helps suggest nearby delivery and pick-up options.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Microphone access lets us capture audio for reels and short videos.</string>
+	<key>NSUserTrackingUsageDescription</key>
+	<string>Toonga uses tracking data to personalize your experience and recommend nearby deals.</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>UILaunchStoryboardName</key>

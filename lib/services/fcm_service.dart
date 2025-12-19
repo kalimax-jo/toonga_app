@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 
@@ -23,6 +24,11 @@ class FcmService {
   bool _guestTokenRegistered = false;
 
   Future<void> init() async {
+    if (Firebase.apps.isEmpty) {
+      debugPrint('[FcmService] Firebase not initialized; skipping messaging setup.');
+      return;
+    }
+
     await _requestPermission();
 
     FirebaseMessaging.onMessage.listen(_handleForegroundMessage);

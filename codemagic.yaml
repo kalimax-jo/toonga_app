@@ -1,6 +1,36 @@
 workflows:
+
+  # =====================================
+  # iOS SIMULATOR PREVIEW (BROWSER PREVIEW)
+  # =====================================
+  ios-preview:
+    name: iOS Simulator Preview
+    instance_type: mac_mini_m2
+    max_build_duration: 60
+
+    environment:
+      flutter: stable
+      xcode: latest
+
+    scripts:
+      - name: Flutter clean & get packages
+        script: |
+          flutter clean
+          flutter pub get
+
+      - name: Build iOS simulator app
+        script: |
+          flutter build ios --simulator --debug
+
+    artifacts:
+      - build/ios/iphonesimulator/*.app
+
+
+  # ==============================
+  # iOS RELEASE → TESTFLIGHT
+  # ==============================
   ios-release:
-    name: iOS Release
+    name: iOS Release (TestFlight)
     instance_type: mac_mini_m2
     max_build_duration: 120
 
@@ -15,12 +45,12 @@ workflows:
         bundle_identifier: com.toongapp
 
     scripts:
-      - name: Flutter clean
+      - name: Flutter clean & get packages
         script: |
           flutter clean
           flutter pub get
 
-      - name: Install pods
+      - name: Install CocoaPods
         script: |
           cd ios
           pod install --repo-update

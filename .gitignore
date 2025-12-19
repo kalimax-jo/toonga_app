@@ -57,6 +57,7 @@ documentation/*.json
 build/
 ios/Pods/
 ios/.symlinks/
+ios/Runner/GoogleService-Info.plist
 
 # IDE
 .vscode/

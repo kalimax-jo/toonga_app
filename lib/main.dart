@@ -1,4 +1,5 @@
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'screens/splash_screen.dart';
 import 'screens/onboarding/onboarding_screen.dart';
@@ -21,6 +22,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'screens/orders/deliveries_screen.dart';
 import 'screens/vendors/vendors_screen.dart';
 import 'screens/wishlist/wishlist_screen.dart';
+import 'navigation/route_observer.dart';
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
@@ -29,10 +31,19 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
-  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-  await FcmService.instance.init();
+  var firebaseReady = false;
+  try {
+    await Firebase.initializeApp();
+    firebaseReady = true;
+    FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  } catch (error, stack) {
+    debugPrint('Firebase initialization failed: $error');
+    debugPrint(stack.toString());
+  }
   runApp(const ToongaApp());
+  if (firebaseReady) {
+    Future.microtask(() => FcmService.instance.init());
+  }
 }
 
 class ToongaApp extends StatelessWidget {
@@ -47,6 +58,7 @@ class ToongaApp extends StatelessWidget {
       darkTheme: AppTheme.darkTheme,
       themeMode: ThemeMode.dark,
       initialRoute: "/",
+      navigatorObservers: [appRouteObserver],
       routes: {
         "/": (context) => const SplashScreen(),
         "/onboarding": (context) => const OnboardingScreen(),
